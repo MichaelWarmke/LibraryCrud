@@ -3,20 +3,58 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'war'
     id 'java'
+    id 'idea'
 }
 
 group 'com.warmke.mike.libcrud'
 version '1.0-SNAPSHOT'
-sourceCompatibility(11)
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+idea {
+    module {
+        downloadJavadoc = false
+        downloadSources = true
+    }
+}
 
 repositories {
+    mavenLocal()
     mavenCentral()
+    gradlePluginPortal()
+}
+
+ext {
+    set('springCloudVersion', "Hoxton.SR4")
 }
 
 dependencies {
-    implementation group: 'org.springframework', name: 'spring-boot-starter-web', version: '2.2.6'
-    compile group: 'org.springframework', name: 'spring-boot-starter-test', version: '2.2.6'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.2.6.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.2.6.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.2.6.RELEASE'
+    implementation 'org.liquibase:liquibase-core'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'mysql:mysql-connector-java'
+    annotationProcessor 'org.projectlombok:lombok'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.2.6.RELEASE'
+    testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+test {
+    useJUnitPlatform()
 }
